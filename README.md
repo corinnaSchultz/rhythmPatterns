@@ -15,3 +15,8 @@ Use the Option buttons to generate patterns of increasing complexity:
   
 
 Control the density of triplets for Options 3 and 4, by choosing a number between 0 and 1, inclusive. 0 is no triplets, 1 is all triplets.
+
+
+__Sample Rhythm__
+
+![Sample Rhythm](screenshot.jpg?raw=true )
