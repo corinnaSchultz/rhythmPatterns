@@ -1,0 +1,153 @@
+<html>
+
+<head>
+    <script>
+        const oneBeatNotes = ['n', 'q']
+        const oneBeatRests = ['eE', 'Ee', 'Q']
+        const oneBeatTriplet = ['T']
+        const oneBeatTripletWithRests = ['&#0211;', '&#0213;']
+        const barLine = '\''
+        const FourBeatRest = 'QQQQ'
+        const restMeasure = FourBeatRest + barLine
+
+        const oneBeatAll = Array.prototype.concat(oneBeatNotes, oneBeatRests)
+        const tripletAll = Array.prototype.concat(oneBeatTriplet, oneBeatTripletWithRests)
+
+        function getRandomInt(max) {
+            return Math.floor(Math.random() * max);
+        }
+
+        function getTripletProb() {
+            return document.getElementById('probOfTriplet').value
+        }
+
+        function generateString(numberOfBeats, notesArray, tripletArray) {
+            let result = ''
+            const probOfTriplet = getTripletProb()
+            const includeTriplets = probOfTriplet && tripletArray && tripletArray.length
+
+            for (let i = 0; i < numberOfBeats; i++) {
+                if (includeTriplets && shouldInsertTriplet(probOfTriplet)) {
+                    const index = getRandomInt(tripletArray.length)
+                    result += tripletArray[index]
+                } else {
+                    const index = getRandomInt(notesArray.length)
+                    result += notesArray[index]
+                }
+
+                // if this beat is the end of a measure
+                if ((i + 1) % 4 === 0) {
+                    result += barLine
+                    if (shouldInsertRestMeasure() === '1') {
+                        result += restMeasure
+                        i += 4
+                    } else if ((i+1) % 8 === 0 && shouldInsertRestMeasure() === '2') {
+                        result += restMeasure + restMeasure
+                        i += 8
+                    }
+                }
+
+                // arrange rhythm in 4-bar lines
+                if ((i + 1) % 16 === 0) {
+                    result += '<br>'
+                }
+            }
+
+            return result
+
+        }
+
+        function basicOneBeat(numberOfBeats) {
+            return generateString(numberOfBeats, oneBeatNotes)
+        }
+
+        function basicOneBeatWithRest(numberOfBeats) {
+            return generateString(numberOfBeats, oneBeatAll)
+        }
+
+        function shouldInsertTriplet(probability) {
+            return (probability > Math.random())
+        }
+
+        function shouldInsertRestMeasure() {
+            return document.querySelector('input[name="restMeasure"]:checked').value
+        }
+
+        function isBeatOneOrTwo(beatNumber) {
+            return (beatNumber % 3 > 0 && beatNumber % 4 > 0)
+        }
+
+        function basicWithTriplets(numberOfBeats) {
+            return generateString(numberOfBeats, oneBeatAll, oneBeatTriplet)
+        }
+
+        function basicWithAllTriplets(numberOfBeats) {
+            return generateString(numberOfBeats, oneBeatAll, tripletAll)
+        }
+
+        function setString(display) {
+            document.getElementById('generatedString').innerHTML = display
+        }
+
+        function setBeatString(option) {
+            const numberOfBeats = parseInt(document.getElementById('numberOfBeats').value)
+            switch (option) {
+                case 1: setString(basicOneBeat(numberOfBeats)); break;
+                case 2: setString(basicOneBeatWithRest(numberOfBeats)); break;
+                case 3: setString(basicWithTriplets(numberOfBeats)); break;
+                case 4: setString(basicWithAllTriplets(numberOfBeats)); break;
+            }
+        }
+
+    </script>
+
+</head>
+
+<body>
+
+
+    <input id="numberOfBeats" value="4"> number of beats to generate<br>
+    Insert measure of rest
+    <input type="radio" value='0' name="restMeasure" checked>none</input>
+    <input type="radio" value='1' name="restMeasure">after one</input>
+    <input type="radio" value='2' name="restMeasure">after two</input><br>
+
+    <input id="probOfTriplet" type="number" step="0.1" min="0" max="1" value="0"> decimal between 0 and 1 to control triplet frequency (for Options 3 & 4)<br>
+    <button onClick="setBeatString(1)">Option 1</button>
+    <button onClick="setBeatString(2)">Option 2</button>
+    <button onClick="setBeatString(3)">Option 3</button>
+    <button onClick="setBeatString(4)">Option 4</button>
+
+    <!-- 
+    bar line: <span style="font-family: MusiSync; font-size: 32px">'</span><br>
+
+<table>
+    <tr>
+        <td style="border: solid">
+            <p>one beat</p>
+            eighth notes: <span style="font-family: MusiSync; font-size: 32px">ee</span><br>
+            eighth rests: <span style="font-family: MusiSync; font-size: 32px">EE</span><br>
+            linked eighth notes: <span style="font-family: MusiSync; font-size: 32px">n</span><br>
+            quarter note: <span style="font-family: MusiSync; font-size: 32px">q</span><br>
+            quarter rest: <span style="font-family: MusiSync; font-size: 32px">Q</span><br>
+
+        </td>
+        <td style="border: solid">
+            <p>triplets</p>
+            eighth triplet: <span style="font-family: MusiSync; font-size: 32px">T</span><br>
+            eighth triplet: <span style="font-family: MusiSync; font-size: 32px">¤ &#164;</span><br>
+            eighth triplet: <span style="font-family: MusiSync; font-size: 32px">Ñ &#0209;</span><br>
+            eighth triplet: <span style="font-family: MusiSync; font-size: 32px">Ò &#0210;</span><br>
+            eighth triplet: <span style="font-family: MusiSync; font-size: 32px">Ò &#0211;</span><br>
+            eighth triplet: <span style="font-family: MusiSync; font-size: 32px">Ô &#0212;</span><br>
+            eighth triplet: <span style="font-family: MusiSync; font-size: 32px">Õ &#0213;</span><br>
+        </td>
+
+    </tr>
+</table>
+-->
+
+    <div id="generatedString" style="font-family: MusiSync; font-size: 64px"></div>
+</body>
+
+</html>
